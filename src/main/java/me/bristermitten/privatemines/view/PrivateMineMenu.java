@@ -11,11 +11,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
+import java.io.File;
+
 public class PrivateMineMenu {
 
     private static MenuSpec original;
 
-    public PrivateMineMenu(Player p, PrivateMines plugin, MenuConfig config, MineStorage storage, PMConfig pmConfig) {
+    public PrivateMineMenu(Player p, PrivateMines plugin, MenuConfig config, MineStorage storage, PMConfig pmConfig, File f) {
         Validate.notNull(p, "Player");
         Validate.notNull(plugin, "PrivateMines");
         Validate.notNull(config, "MenuConfig");
@@ -26,11 +28,11 @@ public class PrivateMineMenu {
             original = new MenuSpec();
 
             original.addAction("go-to-mine",
-                    e -> goToMine(storage, e));
+                    e -> goToMine(storage, e, f));
             original.addAction("view-mines",
                     e -> openMinesMenu(plugin, config, storage, e));
             original.addAction("change-block",
-                    e -> openChangeBlockMenu(plugin, config, storage, pmConfig, e));
+                    e -> openChangeBlockMenu(plugin, config, storage, pmConfig, e, f));
         }
         PrivateMine mine = storage.get(p);
         Material type = mine != null ? mine.getBlock() : Material.STONE;
@@ -45,8 +47,8 @@ public class PrivateMineMenu {
         p.openInventory(menuSpec.genMenu());
     }
 
-    private void goToMine(MineStorage storage, InventoryClickEvent e) {
-        storage.getOrCreate((Player) e.getWhoClicked()).teleport();
+    private void goToMine(MineStorage storage, InventoryClickEvent e, File f) {
+        storage.getOrCreate((Player) e.getWhoClicked(), f).teleport();
     }
 
     private void openMinesMenu(PrivateMines plugin, MenuConfig config, MineStorage storage, InventoryClickEvent e) {
@@ -54,8 +56,8 @@ public class PrivateMineMenu {
     }
 
     private void openChangeBlockMenu(PrivateMines plugin, MenuConfig config, MineStorage storage, PMConfig pmConfig,
-                                     InventoryClickEvent e) {
+                                     InventoryClickEvent e, File f) {
         new ChangeBlockMenu((Player) e.getWhoClicked(), plugin, pmConfig,
-                config, storage);
+                config, storage, f);
     }
 }
